@@ -6,10 +6,10 @@ using namespace std;
 
 struct KMEANS{
 
-    int n;
+    int n, k;
     vector<Point> pts;
 
-    KMEANS(vector<Point> pts) : pts(pts), n(pts.size())
+    KMEANS(int k, vector<Point> pts) : pts(pts), n(pts.size()), k(k)
     {
   
     }
