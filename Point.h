@@ -27,11 +27,25 @@ struct Point {
         return ans;
     }
 
+    Point operator/(double divisor) const {
+    // Cria uma cópia do ponto atual para não modificá-lo
+    Point ans = *this; 
+    
+    // Itera sobre cada coordenada e a divide pelo divisor
+    for (int i = 0; i < x.size(); i++) {
+        ans.x[i] /= divisor;
+    }
+    
+    // Retorna o novo ponto com as coordenadas divididas
+    return ans;
+}
+
 };
 
 Point operator*(double k, const Point p) {
     return p * k;
 }
+
 
 //Dá pra otimizar removendo a sqrt
 function<double(Point, Point)> distEuclid = [](Point a, Point b){
