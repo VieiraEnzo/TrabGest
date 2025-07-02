@@ -78,7 +78,7 @@ struct KMEANS{
         Objetivo: 
         Complexidade:  
     */
-    int run(){
+    void run(){
         int max = 1000;
         for (int i = 0; i < max; i++){
             vector<Point> centroides_antigos = centroides;
