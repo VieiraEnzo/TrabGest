@@ -10,7 +10,7 @@ struct Point {
     Point(vector<double> k) : x(k) {}
 
     Point operator+(Point other){
-        Point ans = x; 
+        Point ans = *this; 
         for(int i = 0; i < x.size(); i++) ans.x[i] += other.x[i];
         return ans;
     }
