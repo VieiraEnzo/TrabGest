@@ -12,27 +12,27 @@ int main(){
     cout << "read Points\n";
     vector<Point> pts = readPoints("data/Iris.csv");
 
-    Output output("results/Kmeans.csv");
+    Output output("results/Kohonen.csv");
 
     //Prepare search
 
     vector<int> Tmatriz, epocas;
-    vector<double> alfa, raio;
+    vector<double> lr, sigma;
 
-    for(int i = 1; i <= 10; i++) Tmatriz.push_back(i);
-    for(int i = 1; i <= 10; i++) epocas.push_back(i);
-    for(double i = 0.01; i <= 1; i+= 0.01) alfa.push_back(i);
-    for(double i = 0.5; i <= 20; i+= 0.5) raio.push_back(i);
+    for(int i = 1; i <= 5; i++) Tmatriz.push_back(i);
+    for(int i = 1; i <= 5; i++) epocas.push_back(i);
+    for(double i = 0.01; i <= 1; i+= 0.01) lr.push_back(i);
+    for(double i = 0.5; i <= 20; i+= 0.5) sigma.push_back(i);
 
 
     for(auto t : Tmatriz)
         for(auto ep : epocas)
-            for(auto a : alfa)
-                for(auto r : raio){
+            for(auto a : lr)
+                for(auto r : sigma){
 
                     //Process data
                     auto inicio = chrono::steady_clock::now();
-                    Kohonen kohonen(t,r,ep,a, pts);
+                    Kohonen kohonen(t,ep,r,a,pts);
                     kohonen.run();
                     auto fim = chrono::steady_clock::now();
                     auto dur = fim - inicio;
