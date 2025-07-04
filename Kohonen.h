@@ -31,7 +31,7 @@ struct Kohonen{
     // Encontra o Best Matching Unit (BMU) para um ponto
     // Input: Indice de um ponto qualquer
     // Output: i e j do Neuronio mais perto
-    pair<int,int> BMU(int pi){
+    pair<int,int> BMU(int pi) const {
 
         double minValue = 1e18;
         int ansI, ansJ;
@@ -80,4 +80,49 @@ struct Kohonen{
         }
     }
 
+    double quantizationError() const {
+        double sum = 0.0;
+        for (int p = 0; p < n; ++p) {
+            // find BMU for point p
+            auto [bi, bj] = BMU(p);
+            // compute distance
+            double d = distEuclid(pts[p], mp[bi][bj]);
+            sum += d;
+        }
+        // average distance
+        return sum / static_cast<double>(n);
+    }
+
+    vector<vector<double>> computeUMatrix(bool eightNeighborhood = false) const {
+        vector<vector<double>> U(t, vector<double>(t, 0));
+        // deslocamentos para 4 vizinhos
+        const int d4[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+        const int d8[4][2] = {{-1,-1},{-1,1},{1,-1},{1,1}};
+        for(int i = 0; i < t; ++i) {
+            for(int j = 0; j < t; ++j) {
+                double total = 0;
+                int count = 0;
+                // 4 vizinhos
+                for(auto &d : d4) {
+                    int ni = i + d[0], nj = j + d[1];
+                    if(ni>=0 && ni<t && nj>=0 && nj<t) {
+                        total += distEuclid(mp[i][j], mp[ni][nj]);
+                        ++count;
+                    }
+                }
+                // opcionais diagonais
+                if(eightNeighborhood) {
+                    for(auto &d : d8) {
+                        int ni = i + d[0], nj = j + d[1];
+                        if(ni>=0 && ni<t && nj>=0 && nj<t) {
+                            total += distEuclid(mp[i][j], mp[ni][nj]);
+                            ++count;
+                        }
+                    }
+                }
+                U[i][j] = (count > 0) ? (total / count) : 0;
+            }
+        }
+        return U;
+    }
 };
