@@ -152,19 +152,15 @@ struct Kohonen{
         return U;
     }
 
-    vector<vector<int>> computeHitmap() const {
-        vector<vector<int>> hitmap(t, vector<int>(t, 0));
-
+    vector<vector<double>> getBMUClusters(int attr_idx1, int attr_idx2) const {
+        vector<vector<double>> projection;
+        projection.reserve(n);
         for (int p = 0; p < n; ++p) {
-            pair<int, int> bmu_coords = BMU(p);
-            int bmu_i = bmu_coords.first;
-            int bmu_j = bmu_coords.second;
-
-            if (bmu_i >= 0 && bmu_j >= 0) {
-                hitmap[bmu_i][bmu_j]++;
-            }
+            pair<int, int> bmu = BMU(p);
+            double bmu_flat_index = static_cast<double>(bmu.first * t + bmu.second);
+            vector<double> row = {pts[p].x[attr_idx1], pts[p].x[attr_idx2], bmu_flat_index};
+            projection.push_back(row);
         }
-
-        return hitmap;
+        return projection;
     }
 };

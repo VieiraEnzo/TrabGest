@@ -77,7 +77,7 @@ def analyze_kohonen_results(csv_path, output_dir):
 if __name__ == '__main__':
     script_dir = Path(__file__).parent
     csv_file_path = script_dir.parent.parent / 'results' / 'Kohonen.csv'
-    output_directory = script_dir
+    output_directory = script_dir / 'error_plots'
     
     output_directory.mkdir(parents=True, exist_ok=True)
 

@@ -82,7 +82,9 @@ def analyze_umatrix_grids(csv_path, t_matriz):
         plt.tight_layout(rect=[0, 0, 1, 0.98])
         
         output_filename = f"kohonen_umatrix_grid_t{t_matriz}_epochs_{epoch}.png"
-        output_path = SCRIPT_DIR / output_filename
+        output_dir = SCRIPT_DIR / "u_matrix_plots"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = output_dir / output_filename
         plt.savefig(output_path, dpi=150, bbox_inches='tight')
         plt.close(fig)
         print(f"   -> Grid saved as: {output_path}")
