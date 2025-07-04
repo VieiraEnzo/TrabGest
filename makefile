@@ -8,4 +8,4 @@ OlaGuilherme:
 
 TUNGTUNGTUNG:
 	g++ GridKohonen.cpp -fopenmp -O3 -o "bin/kohonen.out"
-	g++ images/kohonen/kohonen_u_matrix.cpp -I. -O3 -o "bin/kohonen_u_matrix.out"
+	g++ images/kohonen/kohonen_grid_u_matrix.cpp -I. -O3 -o "bin/kohonen_grid_u_matrix.out"

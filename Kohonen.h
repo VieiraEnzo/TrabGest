@@ -151,4 +151,20 @@ struct Kohonen{
         }
         return U;
     }
+
+    vector<vector<int>> computeHitmap() const {
+        vector<vector<int>> hitmap(t, vector<int>(t, 0));
+
+        for (int p = 0; p < n; ++p) {
+            pair<int, int> bmu_coords = BMU(p);
+            int bmu_i = bmu_coords.first;
+            int bmu_j = bmu_coords.second;
+
+            if (bmu_i >= 0 && bmu_j >= 0) {
+                hitmap[bmu_i][bmu_j]++;
+            }
+        }
+
+        return hitmap;
+    }
 };
