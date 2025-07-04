@@ -7,4 +7,5 @@ OlaGuilherme:
 	g++ GridKmeans.cpp -O3 -o "bin/kmeans.out"
 
 TUNGTUNGTUNG:
-	g++ GridKohonen.cpp -O3 -o "bin/kohonen.out"
+	g++ GridKohonen.cpp -fopenmp -O3 -o "bin/kohonen.out"
+	g++ images/kohonen/kohonen_grid_u_matrix.cpp -I. -O3 -o "bin/kohonen_grid_u_matrix.out"

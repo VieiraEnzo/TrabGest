@@ -1,3 +1,7 @@
+// Point.h
+#ifndef POINT_H
+#define POINT_H
+
 #include <iostream>
 #include <math.h>
 using namespace std;
@@ -53,3 +57,5 @@ function<double(Point, Point)> distEuclid = [](Point a, Point b){
     for(int i = 0; i < a.x.size(); i++) ans += (a.x[i] - b.x[i]) * (a.x[i] - b.x[i]); 
     return sqrt(ans);
 };
+
+#endif // POINT_H
