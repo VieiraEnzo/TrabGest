@@ -21,17 +21,17 @@ int main(){
     output.add("lr");
     output.add("sigma");
     output.add("quantizationError");
+    output.add("topographicError");
     output.add("time");
     output.newRow();
     
-    //Prepare search    
     vector<int> Tmatriz, epocas;    
     vector<double> lr, sigma;
 
     for(int i = 1; i <= 10; i++) Tmatriz.push_back(i);
     for(int i = 1; i <= 10; i++) epocas.push_back(i);
-    for(double i = 0.01; i <= 0.3; i+= 0.01) lr.push_back(i);
-    for(double i = 0.1; i <= 5; i+= 0.1) sigma.push_back(i);
+    for(double i = 0.01; i <= 1; i+= 0.01) lr.push_back(i);
+    for(double i = 0.1; i <= 10; i+= 0.1) sigma.push_back(i);
     
     // This pragma directive tells OpenMP to parallelize the following four loops.
     #pragma omp parallel for collapse(4) default(none) shared(Tmatriz, epocas, lr, sigma, pts, output)
@@ -54,6 +54,7 @@ int main(){
                     auto dur = fim - inicio;
                     
                     double qError = kohonen.quantizationError();
+                    double tError = kohonen.topographicError();
                     double time_taken = (chrono::duration_cast<chrono::duration<double>>(dur)).count();
 
                     // Only one thread can execute this block at a time, preventing race conditions.
@@ -65,6 +66,7 @@ int main(){
                         output.add(a);
                         output.add(r);
                         output.add(qError);
+                        output.add(tError);
                         output.add(time_taken);
                         output.newRow();
                     }

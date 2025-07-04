@@ -8,29 +8,25 @@ using namespace std;
 typedef Point Neu;
 struct Kohonen{
 
-    int n, t, epochs ; // Numero de pontos, Tamanho da matriz (txt), número de épocas
-    vector<vector<Neu>> mp; // Mapa de neurônios
-    vector<Point> pts; // Entradas do dataset
-    double lr_start; // Taxa de aprendizado inicial
-    double sigma_start; // Raio inicial de vizinhança
+    int n, t, epochs ;
+    vector<vector<Neu>> mp;
+    vector<Point> pts;
+    double lr_start;
+    double sigma_start;
 
     Kohonen(int t, int epochs, double sigma_start, double lr_start, const vector<Point> &pts) : t(t), n(pts.size()), epochs(epochs), sigma_start(sigma_start), lr_start(lr_start), pts(pts), mp(t, vector<Neu>(t, Point(vector<double>{})))
     {   
-        // Inicia os neurônios em pontos randomicos do conjunto de dados
         random_device rd;
         mt19937 gen(rd());
         uniform_int_distribution<> distr(0, pts.size() - 1);
 
         for(int i = 0; i < t; i++){
             for(int j = 0; j < t; j++){
-                mp[i][j] = pts[distr(gen)]; // Obtém os pesos de uma entrada aleatória
+                mp[i][j] = pts[distr(gen)];
             }
         }   
     }
 
-    // Encontra o Best Matching Unit (BMU) para um ponto
-    // Input: Indice de um ponto qualquer
-    // Output: i e j do Neuronio mais perto
     pair<int,int> BMU(int pi) const {
 
         double minValue = 1e18;
@@ -50,8 +46,6 @@ struct Kohonen{
         return {ansI, ansJ};
     }
 
-   // Calcula a influência da vizinhança usando uma função Gaussiana.
-   // A influência diminui à medida que a distância na grade a partir da BMU aumenta.
     double neighborhood_influence(int i, int j, int bi, int bj, double sigma){
         double dist_sq = (i - bi) * (i - bi) + (j - bj) * (j - bj);
         return exp(-dist_sq / (2 * sigma * sigma));
@@ -59,23 +53,22 @@ struct Kohonen{
 
     void run(){
         
-        double tau = epochs*n / 2.0; // total de iterações / 2
-        double k = 0; // Iteração atual
-        for (int e = 0; e < epochs; e++) { // Itera sobre as epochs
-            for (int p = 0; p < n; p++) { // Itera sobre os pontos
-                auto [mi, mj] = BMU(p); // Encontra o melhor neurônio
+        double tau = epochs*n / 2.0;
+        double k = 0;
+        for (int e = 0; e < epochs; e++) {
+            for (int p = 0; p < n; p++) {
+                auto [mi, mj] = BMU(p);
                 
                 double lr = lr_start * exp(- k / tau);
                 double sigma = sigma_start * exp(- k / tau);
 
-                // Atualiza todos os vizinhos baseado no melhor
                 for(int a = 0; a < t; a++){
                     for(int b = 0; b < t; b++){
                         double theta = neighborhood_influence(a,b,mi,mj,sigma);
                         mp[a][b] = mp[a][b] + lr * theta * (pts[p] - mp[a][b]); 
                     }
                 }
-                k++; // Incrementa a iteração atual
+                k++;
             }
         }
     }
@@ -83,26 +76,60 @@ struct Kohonen{
     double quantizationError() const {
         double sum = 0.0;
         for (int p = 0; p < n; ++p) {
-            // find BMU for point p
             auto [bi, bj] = BMU(p);
-            // compute distance
             double d = distEuclid(pts[p], mp[bi][bj]);
             sum += d;
         }
-        // average distance
         return sum / static_cast<double>(n);
+    }
+
+    pair<pair<int, int>, pair<int, int>> BMU_2(int pi) const {
+        double min_dist1 = 1e18;
+        double min_dist2 = 1e18;
+        pair<int, int> bmu1 = {-1, -1};
+        pair<int, int> bmu2 = {-1, -1};
+
+        for (int i = 0; i < t; ++i) {
+            for (int j = 0; j < t; ++j) {
+                double d = distEuclid(pts[pi], mp[i][j]);
+                if (d < min_dist1) {
+                    min_dist2 = min_dist1;
+                    bmu2 = bmu1;
+                    min_dist1 = d;
+                    bmu1 = {i, j};
+                } else if (d < min_dist2) {
+                    min_dist2 = d;
+                    bmu2 = {i, j};
+                }
+            }
+        }
+        return {bmu1, bmu2};
+    }
+
+    double topographicError() const {
+        double error_count = 0.0;
+        for (int p = 0; p < n; ++p) {
+            auto [bmu1, bmu2] = BMU_2(p);
+
+            if (bmu1.first == -1 || bmu2.first == -1) continue;
+
+            int dist_on_grid = abs(bmu1.first - bmu2.first) + abs(bmu1.second - bmu2.second);
+
+            if (dist_on_grid > 1) {
+                error_count++;
+            }
+        }
+        return error_count / static_cast<double>(n);
     }
 
     vector<vector<double>> computeUMatrix(bool eightNeighborhood = false) const {
         vector<vector<double>> U(t, vector<double>(t, 0));
-        // deslocamentos para 4 vizinhos
         const int d4[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
         const int d8[4][2] = {{-1,-1},{-1,1},{1,-1},{1,1}};
         for(int i = 0; i < t; ++i) {
             for(int j = 0; j < t; ++j) {
                 double total = 0;
                 int count = 0;
-                // 4 vizinhos
                 for(auto &d : d4) {
                     int ni = i + d[0], nj = j + d[1];
                     if(ni>=0 && ni<t && nj>=0 && nj<t) {
@@ -110,7 +137,6 @@ struct Kohonen{
                         ++count;
                     }
                 }
-                // opcionais diagonais
                 if(eightNeighborhood) {
                     for(auto &d : d8) {
                         int ni = i + d[0], nj = j + d[1];

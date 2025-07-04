@@ -32,8 +32,8 @@ void saveMatrixToCSV(
 int main() {
     const int t_matriz       = 10;
     const int epochs         = 10;
-    const double sigma_start = t_matriz / 2.0;
-    const double lr_start    = 0.09;
+    const double sigma_start = 4;
+    const double lr_start    = 0.4;
 
     std::cout << "1. Carregando Iris..." << std::endl;
     auto pts = normalizePoints(readPoints("data/Iris.csv"));
